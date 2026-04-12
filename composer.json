@@ -1,0 +1,5 @@
+{
+    "require": {
+        "duitkupg/duitku-php": "dev-master"
+    }
+}

@@ -53,7 +53,7 @@ $site_name = get_setting('site_name', 'SoftCo Tech');
                 <?= nl2br(htmlspecialchars($product['description'])) ?>
             </div>
 
-            <div style="margin-top:4rem; display:flex; gap:2rem; align-items:center;">
+            <div style="margin-top:4rem; display:flex; gap:2rem; align-items:center; justify-content: center;">
                 <a href="checkout.php?id=<?= (int)$product['id'] ?>" class="btn btn-primary" style="padding:1.5rem 3rem; font-size:1.2rem; text-decoration:none;">Purchase Now</a>
                 <a href="#ask-question" class="btn btn-outline" style="padding:1.5rem 3rem; font-size:1.1rem; text-decoration:none;">Ask Question</a>
             </div>

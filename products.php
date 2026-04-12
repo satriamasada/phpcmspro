@@ -44,7 +44,7 @@ $products = $pdo->query("SELECT * FROM products ORDER BY id DESC")->fetchAll();
                     <div style="font-size:1.5rem; font-weight:900; color:var(--primary); margin-bottom:2rem;">Rp <?= number_format($pr['price'], 0, ',', '.') ?></div>
                 </div>
                 </div>
-                <div style="padding:0 2.5rem 2.5rem; display:flex; gap:1rem;">
+                <div style="padding:0 2.5rem 2.5rem; display:flex; gap:1rem; justify-content: center;">
                     <a href="product-detail.php?id=<?= $pr['id'] ?>" class="btn btn-outline" style="flex:1; text-align:center; padding:10px; font-size:0.9rem;">Details</a>
                     <a href="checkout.php?id=<?= $pr['id'] ?>" class="btn btn-primary" style="flex:1; text-align:center; padding:10px; font-size:0.9rem;">Purchase</a>
                 </div>

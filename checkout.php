@@ -8,7 +8,29 @@ $stmt->execute([$product_id]);
 $product = $stmt->fetch();
 
 if (!$product) { header('Location: index.php'); exit; }
-$site_name = "SoftCo.tech";
+$site_name = get_setting('site_name', 'SoftCo Tech');
+date_default_timezone_set('Asia/Jayapura');
+$serverTime = date('Y-m-d H:i:s');
+
+// --- FETCH DUITKU PAYMENT METHODS ---
+$merchantCode = 'DS29592';
+$apiKey = '01a86731deccee01823c1735b1f5c357';
+$isSandbox = true; // Set to false if production
+
+$methods = [];
+try {
+    $duitkuConfig = new \Duitku\Config($apiKey, $merchantCode);
+    $duitkuConfig->setSandboxMode($isSandbox);
+    $methodListRaw = \Duitku\Api::getPaymentMethod($product['price'], $duitkuConfig);
+    $methodResponse = json_decode($methodListRaw);
+    if (isset($methodResponse->paymentFee)) {
+        $methods = $methodResponse->paymentFee;
+    } else {
+        $errorMsg = $methodResponse->statusMessage ?? 'Unknown status from Duitku';
+    }
+} catch (Exception $e) {
+    $errorMsg = $e->getMessage();
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -28,13 +50,14 @@ $site_name = "SoftCo.tech";
         .payment-method { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 2rem; }
         .payment-option { border: 1.5px solid var(--border); padding: 1.5rem; border-radius: 12px; cursor: pointer; text-align: center; transition: all 0.3s; }
         .payment-option i { font-size: 1.5rem; margin-bottom: 0.75rem; display: block; color: var(--text-muted); }
+        .payment-option img { height: 30px; object-fit: contain; margin-bottom: 0.75rem; display: block; margin-left: auto; margin-right: auto; }
         .payment-option.active { border-color: var(--primary); background: #f0f7ff; }
         .payment-option.active i { color: var(--primary); }
     </style>
 </head>
 <body style="background:var(--bg-soft);">
     <nav>
-        <div class="logo">SOFTCO.TECH</div>
+        <div class="logo"><?= strtoupper(htmlspecialchars($site_name)) ?></div>
         <ul class="nav-links"><li><a href="index.php">Back to Store</a></li></ul>
     </nav>
 
@@ -44,7 +67,7 @@ $site_name = "SoftCo.tech";
             <form action="process-checkout.php" method="POST" id="checkoutForm">
                 <input type="hidden" name="product_id" value="<?= $product['id'] ?>">
                 <input type="hidden" name="total_price" value="<?= $product['price'] ?>">
-                <input type="hidden" name="payment_method" id="selected_payment" value="transfer">
+                <input type="hidden" name="payment_method" id="selected_payment" value="<?= !empty($methods) ? $methods[0]->paymentMethod : '' ?>">
                 
                 <div class="input-group">
                     <label>Full Name</label>
@@ -59,16 +82,23 @@ $site_name = "SoftCo.tech";
                     <input type="tel" name="phone" required placeholder="Ex: +62 812 3456 7890">
                 </div>
 
-                <label style="font-weight: 700; color: var(--dark); font-size: 0.9rem;">Payment Method</label>
+                <label style="font-weight: 700; color: var(--dark); font-size: 0.9rem;">Select Payment Method</label>
                 <div class="payment-method">
-                    <div class="payment-option active" data-value="transfer">
-                        <i class="fas fa-university"></i>
-                        <span style="font-weight:700;">Bank Transfer</span>
-                    </div>
-                    <div class="payment-option" data-value="va">
-                        <i class="fas fa-credit-card"></i>
-                        <span style="font-weight:700;">Virtual Account</span>
-                    </div>
+                    <?php if (empty($methods)): ?>
+                        <div style="grid-column: 1/-1; padding: 2rem; text-align: center; background: #fee2e2; color: #991b1b; border-radius: 12px;">
+                            Currently no payment methods available.<br>
+                            <small>Error: <?= htmlspecialchars($errorMsg ?? 'No response from API') ?></small><br>
+                            <small>Server Time: <?= $serverTime ?></small>
+                        </div>
+                    <?php else: ?>
+                        <?php foreach ($methods as $index => $m): ?>
+                            <div class="payment-option <?= $index === 0 ? 'active' : '' ?>" data-value="<?= htmlspecialchars($m->paymentMethod) ?>">
+                                <img src="<?= $m->paymentImage ?>" alt="<?= $m->paymentName ?>">
+                                <span style="font-weight:700; font-size: 0.8rem;"><?= htmlspecialchars($m->paymentName) ?></span>
+                                <div style="font-size: 0.7rem; color: #64748b; margin-top: 4px;">Fee: Rp <?= number_format($m->totalFee, 0, ',', '.') ?></div>
+                            </div>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
                 </div>
 
                 <button type="submit" class="btn btn-primary" style="width:100%; margin-top:3rem; border:none; padding:1.5rem; font-size:1.1rem; cursor:pointer;">Pay for Product</button>

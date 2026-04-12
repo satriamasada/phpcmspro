@@ -161,7 +161,7 @@ $theme_mode = get_setting('theme_mode', 'light');
                 <h3 style="margin-bottom:1rem;"><?= htmlspecialchars($pr['name']) ?></h3>
                 <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom:1.5rem;"><?= htmlspecialchars(substr($pr['description'],0,100)) ?>...</p>
                 <div class="product-price">Rp <?= number_format($pr['price'], 0, ',', '.') ?></div>
-                <div style="display:flex; gap:1rem;">
+                <div style="display:flex; gap:1rem; justify-content: center;">
                     <a href="product-detail.php?id=<?= $pr['id'] ?>" class="btn btn-primary" style="font-size:0.8rem; padding:8px 15px;">Detail</a>
                     <a href="checkout.php?id=<?= $pr['id'] ?>" class="btn btn-outline" style="font-size:0.8rem; padding:8px 15px;">Buy Now</a>
                 </div>
@@ -253,8 +253,8 @@ $theme_mode = get_setting('theme_mode', 'light');
                 <h2 style="font-size:2.5rem; margin-bottom:1.5rem;">Let's Build <span class="accent-text">Something</span> Together.</h2>
                 <p style="color:var(--text-muted); font-size:1.1rem; margin-bottom:2rem;">Contact us today to start your digital transformation journey.</p>
                 <div style="color:var(--dark); font-weight:700;">
-                    <p><i class="fas fa-envelope" style="color:var(--primary); margin-right:1rem;"></i> hello@softco.tech</p>
-                    <p style="margin-top:1rem;"><i class="fas fa-phone" style="color:var(--primary); margin-right:1rem;"></i> +62 812 3456 7890</p>
+                    <p><i class="fas fa-envelope" style="color:var(--primary); margin-right:1rem;"></i> <?= get_setting('site_email', 'hello@softco.tech') ?></p>
+                    <p style="margin-top:1rem;"><i class="fas fa-phone" style="color:var(--primary); margin-right:1rem;"></i> <?= get_setting('site_phone', '+62 812 3456 7890') ?></p>
                 </div>
             </div>
             <div class="fade-up" style="transition-delay:0.3s;">
@@ -300,7 +300,7 @@ $theme_mode = get_setting('theme_mode', 'light');
             </div>
         </div>
         <div style="text-align:center; padding-top:40px; border-top:1px solid var(--border); color:var(--text-muted); font-size:0.9rem;">
-            &copy; <?= date('Y') ?> <?= $site_name ?>. All rights reserved.
+            <?= get_setting('footer_text', '&copy; ' . date('Y') . ' SoftCo Tech Solutions. All Rights Reserved.') ?>
         </div>
     </footer>
 
