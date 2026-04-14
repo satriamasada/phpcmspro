@@ -1,6 +1,6 @@
 <?php
 // gallery-detail.php
-require_once 'config/database.php';
+require_once '../config/database.php';
 
 $id = $_GET['id'] ?? 0;
 $stmt = $pdo->prepare("SELECT * FROM galleries WHERE id = ?");
@@ -8,7 +8,7 @@ $stmt->execute([$id]);
 $item = $stmt->fetch();
 
 if (!$item) {
-    header("Location: index.php");
+    header('Location: index.php');
     exit;
 }
 

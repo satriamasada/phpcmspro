@@ -1,6 +1,6 @@
 <?php
 // news-detail.php
-require_once 'config/database.php';
+require_once '../config/database.php';
 // Pastikan file yang berisi fungsi get_setting() sudah di-include
 // require_once 'includes/functions.php'; 
 
@@ -68,7 +68,7 @@ $site_name = get_setting('site_name', 'SoftCo Tech');
 
     <article class="article-content fade-up" style="transition-delay:0.3s;">
         <?php 
-            $img_src = $article['featured_image'] ?: 'https://via.placeholder.com/800x400';
+            $img_src = $article['featured_image'] ? (strpos($article['featured_image'], 'http') === 0 ? $article['featured_image'] : ltrim($article['featured_image'], './')) : 'https://via.placeholder.com/800x400';
         ?>
         <img src="<?= htmlspecialchars($img_src) ?>" 
              alt="<?= htmlspecialchars($article['title']) ?>"

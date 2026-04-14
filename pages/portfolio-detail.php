@@ -1,15 +1,15 @@
 <?php
-// service-detail.php
-require_once 'config/database.php';
-// Pastikan file yang berisi fungsi get_setting() sudah di-require di sini
-// require_once 'includes/functions.php'; 
+// portfolio-detail.php
+require_once '../config/database.php';
+// Pastikan file yang mengandung fungsi get_setting() sudah di-include, misal:
+// require_once 'includes/functions.php';
 
 $id = $_GET['id'] ?? 0;
-$stmt = $pdo->prepare("SELECT * FROM services WHERE id = ?");
+$stmt = $pdo->prepare("SELECT * FROM portfolio WHERE id = ?");
 $stmt->execute([$id]);
-$service = $stmt->fetch();
+$project = $stmt->fetch();
 
-if (!$service) { 
+if (!$project) { 
     header('Location: index.php'); 
     exit; 
 }
@@ -22,7 +22,7 @@ $site_name = get_setting('site_name', 'SoftCo Tech');
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= htmlspecialchars($service['title']) ?> | <?= htmlspecialchars($site_name) ?></title>
+    <title><?= htmlspecialchars($project['title']) ?> | <?= htmlspecialchars($site_name) ?></title>
     <link rel="stylesheet" href="assets/css/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -32,25 +32,38 @@ $site_name = get_setting('site_name', 'SoftCo Tech');
         <div class="logo"><?= strtoupper(htmlspecialchars($site_name)) ?></div>
         <ul class="nav-links">
             <li><a href="index.php">Home</a></li>
-            <li><a href="index.php#services">Services</a></li>
+            <li><a href="index.php#portfolio">Works</a></li>
         </ul>
     </nav>
 
     <section class="hero" style="min-height:40vh; background:var(--bg-soft); text-align:center; padding-top:100px;">
-        <i class="<?= htmlspecialchars($service['icon']) ?>" style="font-size:4rem; color:var(--primary); margin-bottom:2rem; display:block;"></i>
-        <h1 style="font-size:3rem;"><?= htmlspecialchars($service['title']) ?></h1>
+        <span style="font-size:0.85rem; color:var(--primary); font-weight:700; text-transform:uppercase; letter-spacing:1px;">
+            <?= htmlspecialchars($project['category']) ?>
+        </span>
+        <h1 style="font-size:3rem; margin-top:1rem;"><?= htmlspecialchars($project['title']) ?></h1>
     </section>
 
-    <section style="padding:80px 10%;">
-        <div class="card fade-up" style="max-width:800px; margin:0 auto; padding:4rem; line-height:2;">
-            <p><?= nl2br(htmlspecialchars($service['description'])) ?></p>
+    <section style="padding:100px 10%;">
+        <div class="card fade-up" style="max-width:1000px; margin:0 auto; padding:4rem; line-height:2;">
+            <?php 
+                $img_src = $project['image_url'] ? (strpos($project['image_url'], 'http') === 0 ? $project['image_url'] : $project['image_url']) : 'https://via.placeholder.com/800x600';
+            ?>
+            <img src="<?= htmlspecialchars($img_src) ?>" 
+                 alt="<?= htmlspecialchars($project['title']) ?>"
+                 style="width:100%; border-radius:16px; margin-bottom:3rem; box-shadow:0 10px 30px rgba(0,0,0,0.1);">
             
+            <div style="font-size:1.1rem; color:var(--text-main);">
+                <?= nl2br(htmlspecialchars($project['description'])) ?>
+            </div>
+
             <div style="margin-top:3rem; border-top:1px solid var(--border); padding-top:3rem;">
-                <h3 style="margin-bottom:2rem; font-size:1.5rem; text-align:center;">Request a <span class="accent-text">Proposal</span></h3>
+                <h3 style="margin-bottom:2rem; font-size:1.5rem; text-align:center;">
+                    Start a <span class="accent-text">Similar Project</span>
+                </h3>
                 
                 <form action="process-inquiry.php" method="POST" class="card" style="box-shadow: 0 10px 40px rgba(0,0,0,0.02); max-width:600px; margin:0 auto; padding:3rem;">
-                    <input type="hidden" name="type" value="service">
-                    <input type="hidden" name="related_id" value="<?= (int)$service['id'] ?>">
+                    <input type="hidden" name="type" value="portfolio">
+                    <input type="hidden" name="related_id" value="<?= (int)$project['id'] ?>">
                     
                     <div style="display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; margin-bottom:1.5rem;">
                         <input type="text" name="name" placeholder="Full Name" required style="width:100%; padding:1rem; border:1px solid var(--border); border-radius:8px;">
@@ -62,17 +75,16 @@ $site_name = get_setting('site_name', 'SoftCo Tech');
                     </div>
                     
                     <div style="margin-bottom:2rem;">
-                        <textarea name="message" placeholder="What are your goals with this project?" rows="4" required style="width:100%; padding:1rem; border:1px solid var(--border); border-radius:8px; line-height:1.6;"></textarea>
+                        <textarea name="message" placeholder="What parts of this project inspired you? Tell us about your vision." rows="4" required style="width:100%; padding:1rem; border:1px solid var(--border); border-radius:8px; line-height:1.6;"></textarea>
                     </div>
                     
-                    <button type="submit" class="btn btn-primary" style="width:100%; border:none; cursor:pointer; padding:1.25rem;">Submit Inquiry</button>
+                    <button type="submit" class="btn btn-primary" style="width:100%; border:none; cursor:pointer; padding:1.25rem;">Send My Proposal</button>
                 </form>
             </div>
         </div>
     </section>
 
     <script>
-        // Memastikan AOS-like animation berjalan setelah DOM siap
         document.addEventListener('DOMContentLoaded', () => {
             document.querySelectorAll('.fade-up').forEach(el => el.classList.add('aos-animate'));
         });

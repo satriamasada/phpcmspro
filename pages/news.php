@@ -1,6 +1,6 @@
 <?php
 // news.php
-require_once 'config/database.php';
+require_once '../config/database.php';
 
 $site_name = get_setting('site_name', 'SoftCo Tech');
 $theme_mode = get_setting('theme_mode', 'light');
