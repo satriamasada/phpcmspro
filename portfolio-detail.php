@@ -1,0 +1,111 @@
+<?php
+// portfolio-detail.php
+require_once 'config/database.php';
+// Pastikan file yang mengandung fungsi get_setting() sudah di-include, misal:
+// require_once 'includes/functions.php';
+
+$id = $_GET['id'] ?? 0;
+$stmt = $pdo->prepare("SELECT * FROM portfolio WHERE id = ?");
+$stmt->execute([$id]);
+$project = $stmt->fetch();
+
+if (!$project) { 
+    header('Location: index.php'); 
+    exit; 
+}
+
+// Menggunakan fungsi get_setting sesuai saran Anda
+$site_name = get_setting('site_name', 'SoftCo Tech');
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><?= htmlspecialchars($project['title']) ?> | <?= htmlspecialchars($site_name) ?></title>
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <nav>
+        <div class="logo"><?= strtoupper(htmlspecialchars($site_name)) ?></div>
+        <ul class="nav-links">
+            <li><a href="index.php">Home</a></li>
+            <li><a href="index.php#portfolio">Works</a></li>
+        </ul>
+    </nav>
+
+    <section class="hero" style="min-height:40vh; background:var(--bg-soft); text-align:center; padding-top:100px;">
+        <span style="font-size:0.85rem; color:var(--primary); font-weight:700; text-transform:uppercase; letter-spacing:1px;">
+            <?= htmlspecialchars($project['category']) ?>
+        </span>
+        <h1 style="font-size:3rem; margin-top:1rem;"><?= htmlspecialchars($project['title']) ?></h1>
+    </section>
+
+    <section style="padding:100px 10%;">
+        <div class="card fade-up" style="max-width:1000px; margin:0 auto; padding:4rem; line-height:2;">
+            <?php 
+                $img_src = $project['image_url'] ? (strpos($project['image_url'], 'http') === 0 ? $project['image_url'] : $project['image_url']) : 'https://via.placeholder.com/800x600';
+            ?>
+            <img src="<?= htmlspecialchars($img_src) ?>" 
+                 alt="<?= htmlspecialchars($project['title']) ?>"
+                 style="width:100%; border-radius:16px; margin-bottom:3rem; box-shadow:0 10px 30px rgba(0,0,0,0.1);">
+            
+            <div style="font-size:1.1rem; color:var(--text-main);">
+                <?= nl2br(htmlspecialchars($project['description'])) ?>
+            </div>
+        </div>
+    </section>
+
+    <section class="bg-soft-indigo" style="padding:80px 10%; border-top:1px solid var(--border-light);">
+        <div class="fade-up" style="max-width:800px; margin:0 auto;">
+            <div class="section-head" style="margin-bottom: 3rem;">
+                <h3 style="font-size:2.5rem; margin-bottom:1rem; text-align:center;">Start a <span class="accent-text">Similar Project</span></h3>
+                <div class="underline"></div>
+                <p style="text-align:center; color: var(--text-muted); margin-top:1.5rem;">Inspired by this work? Let's discuss how we can create something equally amazing for your business.</p>
+            </div>
+
+            <form action="process-inquiry.php" method="POST" class="card"
+                style="box-shadow: var(--shadow-lg); max-width:650px; margin:0 auto; padding:3.5rem;">
+                <input type="hidden" name="type" value="portfolio">
+                <input type="hidden" name="related_id" value="<?= (int) $project['id'] ?>">
+
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; margin-bottom:1.5rem;">
+                    <div class="form-group">
+                        <label style="display:block; margin-bottom:0.5rem; font-weight:600; font-size:0.9rem;">Full Name</label>
+                        <input type="text" name="name" placeholder="John Doe" required
+                            style="width:100%; padding:1rem; border:1px solid var(--border); border-radius:8px;">
+                    </div>
+                    <div class="form-group">
+                        <label style="display:block; margin-bottom:0.5rem; font-weight:600; font-size:0.9rem;">Email Address</label>
+                        <input type="email" name="email" placeholder="john@example.com" required
+                            style="width:100%; padding:1rem; border:1px solid var(--border); border-radius:8px;">
+                    </div>
+                </div>
+
+                <div style="margin-bottom:1.5rem;">
+                    <label style="display:block; margin-bottom:0.5rem; font-weight:600; font-size:0.9rem;">Phone Number</label>
+                    <input type="tel" name="phone" placeholder="+62 812..." required
+                        style="width:100%; padding:1rem; border:1px solid var(--border); border-radius:8px;">
+                </div>
+
+                <div style="margin-bottom:2rem;">
+                    <label style="display:block; margin-bottom:0.5rem; font-weight:600; font-size:0.9rem;">Vision & Goals</label>
+                    <textarea name="message" placeholder="What parts of this project inspired you? Tell us about your vision." rows="5" required
+                        style="width:100%; padding:1rem; border:1px solid var(--border); border-radius:8px; line-height:1.6;"></textarea>
+                </div>
+
+                <button type="submit" class="btn btn-primary"
+                    style="width:100%; border:none; cursor:pointer; padding:1.25rem;">Send My Proposal</button>
+            </form>
+        </div>
+    </section>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('.fade-up').forEach(el => el.classList.add('aos-animate'));
+        });
+    </script>
+</body>
+</html>
