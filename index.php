@@ -4,7 +4,7 @@
 require_once 'config/database.php';
 
 // Fetch Data
-$services = $pdo->query("SELECT * FROM services ORDER BY id DESC LIMIT 6")->fetchAll();
+$services = $pdo->query("SELECT * FROM services ORDER BY id DESC LIMIT 3")->fetchAll();
 $projects = $pdo->query("SELECT * FROM portfolio ORDER BY id DESC LIMIT 3")->fetchAll();
 $products = $pdo->query("SELECT * FROM products ORDER BY id DESC LIMIT 3")->fetchAll();
 $news = $pdo->query("SELECT n.*, u.full_name FROM news n JOIN users u ON n.author_id = u.id WHERE n.is_published = 1 ORDER BY n.created_at DESC LIMIT 3")->fetchAll();
@@ -127,13 +127,14 @@ $theme_mode = get_setting('theme_mode', 'light');
             <h2 class="fade-up">Visual <span class="accent-text">Showcase</span></h2>
             <p class="fade-up" style="color:var(--text-muted); margin-top:1rem;">Highlights from our latest events and office life.</p>
         </div>
-        <div class="grid-container" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap:1.5rem;">
+        <div class="grid-container">
             <?php foreach ($gallery as $g): ?>
-            <a href="gallery-detail.php?id=<?= $g['id'] ?>" class="fade-up" style="display:block; text-decoration:none; position:relative; height:350px; border-radius:20px; overflow:hidden; border:1px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.02);">
-                <img src="<?= $g['image_path'] ?>" style="width:100%; height:100%; object-fit:cover; transition:transform 0.8s cubic-bezier(0.23, 1, 0.32, 1);" onmouseover="this.style.transform='scale(1.15) rotate(1deg)'" onmouseout="this.style.transform='scale(1)'">
-                <div style="position:absolute; bottom:0; left:0; width:100%; padding:2.5rem; background:linear-gradient(transparent, rgba(0,0,0,0.9)); color:white; transform: translateY(10px); transition: transform 0.3s;">
-                    <span style="font-size:0.75rem; text-transform:uppercase; letter-spacing:3px; color:var(--primary); font-weight:800;"><?= htmlspecialchars($g['category']) ?></span>
-                    <h4 style="font-size:1.25rem; margin-top:0.5rem; font-weight:700;"><?= htmlspecialchars($g['title']) ?></h4>
+            <a href="gallery-detail.php?id=<?= $g['id'] ?>" class="project-card fade-up" style="display:block; text-decoration:none;">
+                <img src="<?= $g['image_path'] ?>" class="project-img">
+                <div class="project-overlay">
+                    <span style="font-size:0.75rem; text-transform:uppercase; font-weight:700; color:var(--secondary);"><?= htmlspecialchars($g['category']) ?></span>
+                    <h3 style="margin-top:0.5rem;"><?= htmlspecialchars($g['title']) ?></h3>
+                    <span style="font-size:0.85rem; color:#fff; border-bottom:1px solid rgba(255,255,255,0.3); padding-bottom:5px;">View Detail</span>
                 </div>
             </a>
             <?php endforeach; ?>
